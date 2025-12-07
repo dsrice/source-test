@@ -16,14 +16,26 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Product>>> GetAll()
+    public async Task<ActionResult<IEnumerable<ProductResponseDto>>> GetAll([FromQuery] ProductQueryParameters parameters)
     {
-        var products = await _service.GetAllProductsAsync();
+        // フィルタ条件がない場合はnullを渡して全件取得
+        if (string.IsNullOrEmpty(parameters.Name) && !parameters.MinPrice.HasValue && !parameters.MaxPrice.HasValue)
+        {
+            var allProducts = await _service.GetProductsAsync();
+            return Ok(allProducts);
+        }
+
+        // フィルタ条件がある場合はExpressionを使用
+        var products = await _service.GetProductsAsync(p =>
+            (string.IsNullOrEmpty(parameters.Name) || p.Name.Contains(parameters.Name)) &&
+            (!parameters.MinPrice.HasValue || p.Price >= parameters.MinPrice.Value) &&
+            (!parameters.MaxPrice.HasValue || p.Price <= parameters.MaxPrice.Value)
+        );
         return Ok(products);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Product>> GetById(int id)
+    public async Task<ActionResult<ProductResponseDto>> GetById(int id)
     {
         var product = await _service.GetProductByIdAsync(id);
         if (product == null)
@@ -34,7 +46,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Product>> Create(CreateProductRequest request)
+    public async Task<ActionResult<ProductResponseDto>> Create(CreateProductRequest request)
     {
         var createdProduct = await _service.CreateProductAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);

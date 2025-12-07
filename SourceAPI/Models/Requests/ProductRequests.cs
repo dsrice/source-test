@@ -1,4 +1,4 @@
-namespace SourceAPI.Models;
+namespace SourceAPI.Models.Requests;
 
 public class CreateProductRequest
 {

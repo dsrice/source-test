@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using SourceAPI.Models;
 using SourceAPI.Repositories.Interfaces;
 using SourceAPI.Services.Interfaces;
@@ -13,17 +14,19 @@ public class ProductService : IProductService
         _repository = repository;
     }
 
-    public async Task<IEnumerable<Product>> GetAllProductsAsync()
+    public async Task<IEnumerable<ProductResponseDto>> GetProductsAsync(Expression<Func<Product, bool>>? predicate = null)
     {
-        return await _repository.GetAllAsync();
+        var products = await _repository.GetAsync(predicate);
+        return products.Select(MapToDto);
     }
 
-    public async Task<Product?> GetProductByIdAsync(int id)
+    public async Task<ProductResponseDto?> GetProductByIdAsync(int id)
     {
-        return await _repository.GetByIdAsync(id);
+        var product = await _repository.GetByIdAsync(id);
+        return product == null ? null : MapToDto(product);
     }
 
-    public async Task<Product> CreateProductAsync(CreateProductRequest request)
+    public async Task<ProductResponseDto> CreateProductAsync(CreateProductRequest request)
     {
         var product = new Product
         {
@@ -31,7 +34,8 @@ public class ProductService : IProductService
             Price = request.Price
         };
 
-        return await _repository.CreateAsync(product);
+        var createdProduct = await _repository.CreateAsync(product);
+        return MapToDto(createdProduct);
     }
 
     public async Task<bool> UpdateProductAsync(int id, UpdateProductRequest request)
@@ -59,5 +63,17 @@ public class ProductService : IProductService
 
         await _repository.DeleteAsync(product);
         return true;
+    }
+
+    private static ProductResponseDto MapToDto(Product product)
+    {
+        return new ProductResponseDto
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Price = product.Price,
+            CreatedAt = product.CreatedAt,
+            UpdatedAt = product.UpdatedAt
+        };
     }
 }

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using SourceAPI.Data;
 using SourceAPI.Models;
@@ -14,9 +15,14 @@ public class ProductRepository : IProductRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Product>> GetAllAsync()
+    public async Task<IEnumerable<Product>> GetAsync(Expression<Func<Product, bool>>? predicate = null)
     {
-        return await _context.Products.ToListAsync();
+        if (predicate == null)
+        {
+            return await _context.Products.ToListAsync();
+        }
+
+        return await _context.Products.Where(predicate).ToListAsync();
     }
 
     public async Task<Product?> GetByIdAsync(int id)
@@ -39,7 +45,10 @@ public class ProductRepository : IProductRepository
 
     public async Task DeleteAsync(Product product)
     {
-        _context.Products.Remove(product);
+        // 論理削除（ソフトデリート）
+        product.IsDeleted = true;
+        product.DeletedAt = DateTime.UtcNow;
+        _context.Products.Update(product);
         await _context.SaveChangesAsync();
     }
 
