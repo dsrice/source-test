@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SourceAPI.Models;
+using SourceAPI.Models.Entities;
 
 namespace SourceAPI.Data;
 

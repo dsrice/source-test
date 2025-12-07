@@ -1,5 +1,7 @@
 using System.Linq.Expressions;
-using SourceAPI.Models;
+using SourceAPI.Models.Entities;
+using SourceAPI.Models.Requests;
+using SourceAPI.Models.Responses;
 using SourceAPI.Repositories.Interfaces;
 using SourceAPI.Services.Interfaces;
 
@@ -14,19 +16,19 @@ public class ProductService : IProductService
         _repository = repository;
     }
 
-    public async Task<IEnumerable<ProductResponseDto>> GetProductsAsync(Expression<Func<Product, bool>>? predicate = null)
+    public async Task<IEnumerable<ProductResponse>> GetProductsAsync(Expression<Func<Product, bool>>? predicate = null)
     {
         var products = await _repository.GetAsync(predicate);
         return products.Select(MapToDto);
     }
 
-    public async Task<ProductResponseDto?> GetProductByIdAsync(int id)
+    public async Task<ProductResponse?> GetProductByIdAsync(int id)
     {
         var product = await _repository.GetByIdAsync(id);
         return product == null ? null : MapToDto(product);
     }
 
-    public async Task<ProductResponseDto> CreateProductAsync(CreateProductRequest request)
+    public async Task<ProductResponse> CreateProductAsync(CreateProductRequest request)
     {
         var product = new Product
         {
@@ -65,9 +67,9 @@ public class ProductService : IProductService
         return true;
     }
 
-    private static ProductResponseDto MapToDto(Product product)
+    private static ProductResponse MapToDto(Product product)
     {
-        return new ProductResponseDto
+        return new ProductResponse
         {
             Id = product.Id,
             Name = product.Name,

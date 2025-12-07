@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using SourceAPI.Models;
+using SourceAPI.Models.QueryParameters;
+using SourceAPI.Models.Requests;
+using SourceAPI.Models.Responses;
 using SourceAPI.Services.Interfaces;
 
 namespace SourceAPI.Controllers;
@@ -16,7 +18,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductResponseDto>>> GetAll([FromQuery] ProductQueryParameters parameters)
+    public async Task<ActionResult<IEnumerable<ProductResponse>>> GetAll([FromQuery] ProductQueryParameters parameters)
     {
         // フィルタ条件がない場合はnullを渡して全件取得
         if (string.IsNullOrEmpty(parameters.Name) && !parameters.MinPrice.HasValue && !parameters.MaxPrice.HasValue)
@@ -35,7 +37,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ProductResponseDto>> GetById(int id)
+    public async Task<ActionResult<ProductResponse>> GetById(int id)
     {
         var product = await _service.GetProductByIdAsync(id);
         if (product == null)
@@ -46,7 +48,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ProductResponseDto>> Create(CreateProductRequest request)
+    public async Task<ActionResult<ProductResponse>> Create(CreateProductRequest request)
     {
         var createdProduct = await _service.CreateProductAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);

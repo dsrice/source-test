@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using SourceAPI.Models;
+using SourceAPI.Models.Entities;
 
 namespace SourceAPI.Repositories.Interfaces;
 
