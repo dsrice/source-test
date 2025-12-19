@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using SourceAPI.Data;
-using SourceAPI.Models.Entities;
+using SourceAPI.Models.DB;
 using SourceAPI.Repositories.Interfaces;
 
 namespace SourceAPI.Repositories;

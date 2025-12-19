@@ -1,4 +1,4 @@
-namespace SourceAPI.Models.Entities;
+namespace SourceAPI.Models.DB;
 
 public class Product
 {
@@ -6,7 +6,6 @@ public class Product
     public string Name { get; set; } = string.Empty;
     public decimal Price { get; set; }
 
-    // 監査フィールド
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public bool IsDeleted { get; set; }

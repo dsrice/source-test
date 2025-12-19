@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using SourceAPI.Models.Entities;
+using SourceAPI.Models.DB;
 using SourceAPI.Models.Requests;
 using SourceAPI.Models.Responses;
 
