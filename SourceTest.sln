@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceAPI", "SourceAPI\SourceAPI.csproj", "{443483C3-2E8D-4A6A-8E6D-75A2604A22F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceAPI.Generators", "SourceAPI.Generators\SourceAPI.Generators.csproj", "{4AE33E7F-357E-44A6-B191-B25A7B73F03A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,18 @@ Global
 		{443483C3-2E8D-4A6A-8E6D-75A2604A22F8}.Release|x64.Build.0 = Release|Any CPU
 		{443483C3-2E8D-4A6A-8E6D-75A2604A22F8}.Release|x86.ActiveCfg = Release|Any CPU
 		{443483C3-2E8D-4A6A-8E6D-75A2604A22F8}.Release|x86.Build.0 = Release|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Debug|x64.Build.0 = Debug|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Debug|x86.Build.0 = Debug|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Release|x64.ActiveCfg = Release|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Release|x64.Build.0 = Release|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Release|x86.ActiveCfg = Release|Any CPU
+		{4AE33E7F-357E-44A6-B191-B25A7B73F03A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
