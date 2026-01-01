@@ -1,2 +1,6 @@
 /SourceAPI/bin/
 SourceAPI/obj/
+.idea/.idea.SourceTest/.idea/encodings.xml
+.idea/
+SourceAPI.Generators/bin/
+SourceAPI.Generators/obj/

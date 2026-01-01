@@ -20,4 +20,8 @@
       <Folder Include="Services\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\SourceAPI.Generators\SourceAPI.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    </ItemGroup>
+
 </Project>
