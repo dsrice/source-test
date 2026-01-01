@@ -42,6 +42,11 @@ namespace SourceAPI.Generators
             if (!HasAuditableEntityAttribute(symbol))
                 return null;
 
+            // SourceAPI.Models.DB namespaceのみを対象にする
+            var namespaceName = symbol.ContainingNamespace.ToDisplayString();
+            if (namespaceName != "SourceAPI.Models.DB")
+                return null;
+
             return symbol;
         }
 
@@ -100,11 +105,6 @@ namespace {namespaceName}
         /// エンティティがアクティブ（削除されていない）かどうか
         /// </summary>
         public bool IsActive => !IsDeleted;
-
-        /// <summary>
-        /// 最後の更新からの経過時間
-        /// </summary>
-        public System.TimeSpan TimeSinceLastUpdate => System.DateTime.UtcNow - UpdatedAt;
 
         // === ヘルパーメソッド ===
         /// <summary>
