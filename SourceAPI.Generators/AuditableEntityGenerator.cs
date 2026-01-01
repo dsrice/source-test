@@ -12,21 +12,22 @@ namespace SourceAPI.Generators
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            // partial classを持つクラスをフィルタ
+            // [AuditableEntity]属性を持つpartial classをフィルタ
             var classDeclarations = context.SyntaxProvider
                 .CreateSyntaxProvider(
                     predicate: static (s, _) => IsCandidateClass(s),
                     transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx))
                 .Where(static m => m is not null);
 
-            // ソースコード生成
+            // 監査フィールドとヘルパーメソッドを生成
             context.RegisterSourceOutput(classDeclarations, static (spc, source) => Execute(source!, spc));
         }
 
         private static bool IsCandidateClass(SyntaxNode node)
         {
             return node is ClassDeclarationSyntax classDeclaration &&
-                   classDeclaration.Modifiers.Any(Microsoft.CodeAnalysis.CSharp.SyntaxKind.PartialKeyword);
+                   classDeclaration.Modifiers.Any(Microsoft.CodeAnalysis.CSharp.SyntaxKind.PartialKeyword) &&
+                   classDeclaration.AttributeLists.Count > 0;
         }
 
         private static INamedTypeSymbol? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
@@ -37,23 +38,17 @@ namespace SourceAPI.Generators
             if (symbol == null)
                 return null;
 
-            // BaseEntityを継承しているか確認
-            if (!InheritsFromBaseEntity(symbol))
+            // [AuditableEntity]属性を持つか確認
+            if (!HasAuditableEntityAttribute(symbol))
                 return null;
 
             return symbol;
         }
 
-        private static bool InheritsFromBaseEntity(INamedTypeSymbol classSymbol)
+        private static bool HasAuditableEntityAttribute(INamedTypeSymbol classSymbol)
         {
-            var baseType = classSymbol.BaseType;
-            while (baseType != null)
-            {
-                if (baseType.Name == "BaseEntity")
-                    return true;
-                baseType = baseType.BaseType;
-            }
-            return false;
+            return classSymbol.GetAttributes().Any(attr =>
+                attr.AttributeClass?.Name == "AuditableEntityAttribute");
         }
 
         private static void Execute(INamedTypeSymbol classSymbol, SourceProductionContext context)
@@ -61,7 +56,7 @@ namespace SourceAPI.Generators
             var namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
             var className = classSymbol.Name;
 
-            // partial classでヘルパーメソッドを生成
+            // partial classで監査フィールドとヘルパーメソッドを生成
             var source = GeneratePartialClass(namespaceName, className);
             context.AddSource($"{className}.g.cs", source);
         }
@@ -75,14 +70,43 @@ namespace {namespaceName}
 {{
     /// <summary>
     /// Source Generator により自動生成されたpartial class
+    /// 監査フィールドとヘルパーメソッドを提供
     /// </summary>
-    public partial class {className}
+    public partial class {className} : SourceAPI.Interfaces.IAuditableEntity
     {{
+        // === 監査フィールド ===
+        /// <summary>
+        /// 作成日時
+        /// </summary>
+        public System.DateTime CreatedAt {{ get; set; }}
+
+        /// <summary>
+        /// 更新日時
+        /// </summary>
+        public System.DateTime UpdatedAt {{ get; set; }}
+
+        /// <summary>
+        /// 論理削除フラグ
+        /// </summary>
+        public bool IsDeleted {{ get; set; }}
+
+        /// <summary>
+        /// 削除日時
+        /// </summary>
+        public System.DateTime? DeletedAt {{ get; set; }}
+
+        // === ヘルパープロパティ ===
         /// <summary>
         /// エンティティがアクティブ（削除されていない）かどうか
         /// </summary>
         public bool IsActive => !IsDeleted;
 
+        /// <summary>
+        /// 最後の更新からの経過時間
+        /// </summary>
+        public System.TimeSpan TimeSinceLastUpdate => System.DateTime.UtcNow - UpdatedAt;
+
+        // === ヘルパーメソッド ===
         /// <summary>
         /// エンティティを論理削除としてマーク
         /// </summary>
@@ -100,16 +124,6 @@ namespace {namespaceName}
             IsDeleted = false;
             DeletedAt = null;
         }}
-
-        /// <summary>
-        /// エンティティの年齢（作成からの経過時間）
-        /// </summary>
-        public System.TimeSpan Age => System.DateTime.UtcNow - CreatedAt;
-
-        /// <summary>
-        /// 最後の更新からの経過時間
-        /// </summary>
-        public System.TimeSpan TimeSinceLastUpdate => System.DateTime.UtcNow - UpdatedAt;
     }}
 }}
 ";

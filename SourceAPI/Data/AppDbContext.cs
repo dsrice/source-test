@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SourceAPI.Models.DB;
+using SourceAPI.Interfaces;
 
 namespace SourceAPI.Data;
 
@@ -16,9 +17,9 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // BaseEntityを継承するすべてのエンティティに監査フィールドとクエリフィルターを設定
-        ConfigureBaseEntity<Product>(modelBuilder);
-        ConfigureBaseEntity<User>(modelBuilder);
+        // IAuditableEntityを実装するすべてのエンティティに監査フィールドとクエリフィルターを設定
+        ConfigureAuditableEntity<Product>(modelBuilder);
+        ConfigureAuditableEntity<User>(modelBuilder);
 
         // Product固有の設定
         modelBuilder.Entity<Product>(entity =>
@@ -57,9 +58,9 @@ public class AppDbContext : DbContext
     }
 
     /// <summary>
-    /// BaseEntityを継承するエンティティの共通設定
+    /// IAuditableEntityを実装するエンティティの共通設定
     /// </summary>
-    private void ConfigureBaseEntity<TEntity>(ModelBuilder modelBuilder) where TEntity : BaseEntity
+    private void ConfigureAuditableEntity<TEntity>(ModelBuilder modelBuilder) where TEntity : class, IAuditableEntity
     {
         modelBuilder.Entity<TEntity>(entity =>
         {
@@ -76,8 +77,8 @@ public class AppDbContext : DbContext
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // BaseEntityを継承するすべてのエンティティの監査フィールドを自動設定
-        var entries = ChangeTracker.Entries<BaseEntity>();
+        // IAuditableEntityを実装するすべてのエンティティの監査フィールドを自動設定
+        var entries = ChangeTracker.Entries<IAuditableEntity>();
 
         foreach (var entry in entries)
         {

@@ -1,6 +1,9 @@
+using SourceAPI.Attributes;
+
 namespace SourceAPI.Models.DB;
 
-public partial class User : BaseEntity
+[AuditableEntity]
+public partial class User
 {
     public int Id { get; set; }
     public string Username { get; set; } = string.Empty;
