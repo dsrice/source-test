@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using MapsterMapper;
 using SourceAPI.Models.DB;
 using SourceAPI.Models.Requests;
 using SourceAPI.Models.Responses;
@@ -10,10 +11,12 @@ namespace SourceAPI.Services;
 public class ProductService : IProductService
 {
     private readonly IProductRepository _repository;
+    private readonly IMapper _mapper;
 
-    public ProductService(IProductRepository repository)
+    public ProductService(IProductRepository repository, IMapper mapper)
     {
         _repository = repository;
+        _mapper = mapper;
     }
 
     public async Task<IEnumerable<ProductResponse>> GetProductsAsync(Expression<Func<Product, bool>>? predicate = null)
@@ -23,13 +26,13 @@ public class ProductService : IProductService
         {
             throw new InvalidOperationException("商品の取得に失敗しました");
         }
-        return products.Select(MapToDto);
+        return _mapper.Map<IEnumerable<ProductResponse>>(products);
     }
 
     public async Task<ProductResponse?> GetProductByIdAsync(int id)
     {
         var product = await _repository.GetByIdAsync(id);
-        return product == null ? null : MapToDto(product);
+        return product == null ? null : _mapper.Map<ProductResponse>(product);
     }
 
     public async Task<ProductResponse> CreateProductAsync(CreateProductRequest request)
@@ -46,7 +49,7 @@ public class ProductService : IProductService
             throw new InvalidOperationException("商品の作成に失敗しました");
         }
 
-        return MapToDto(product);
+        return _mapper.Map<ProductResponse>(product);
     }
 
     public async Task<bool> UpdateProductAsync(int id, UpdateProductRequest request)
@@ -72,17 +75,5 @@ public class ProductService : IProductService
         }
 
         return await _repository.DeleteAsync(product);
-    }
-
-    private static ProductResponse MapToDto(Product product)
-    {
-        return new ProductResponse
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Price = product.Price,
-            CreatedAt = product.CreatedAt,
-            UpdatedAt = product.UpdatedAt
-        };
     }
 }
