@@ -3,6 +3,7 @@ using SourceAPI.Attributes;
 namespace SourceAPI.Models.DB;
 
 [AuditableEntity]
+[GenerateRepository]
 public partial class User
 {
     public int Id { get; set; }

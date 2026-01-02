@@ -19,6 +19,10 @@ public class ProductService : IProductService
     public async Task<IEnumerable<ProductResponse>> GetProductsAsync(Expression<Func<Product, bool>>? predicate = null)
     {
         var products = await _repository.GetAsync(predicate);
+        if (products == null)
+        {
+            throw new InvalidOperationException("商品の取得に失敗しました");
+        }
         return products.Select(MapToDto);
     }
 
@@ -36,8 +40,13 @@ public class ProductService : IProductService
             Price = request.Price
         };
 
-        var createdProduct = await _repository.CreateAsync(product);
-        return MapToDto(createdProduct);
+        var success = await _repository.CreateAsync(product);
+        if (!success)
+        {
+            throw new InvalidOperationException("商品の作成に失敗しました");
+        }
+
+        return MapToDto(product);
     }
 
     public async Task<bool> UpdateProductAsync(int id, UpdateProductRequest request)
@@ -51,8 +60,7 @@ public class ProductService : IProductService
         product.Name = request.Name;
         product.Price = request.Price;
 
-        await _repository.UpdateAsync(product);
-        return true;
+        return await _repository.UpdateAsync(product);
     }
 
     public async Task<bool> DeleteProductAsync(int id)
@@ -63,8 +71,7 @@ public class ProductService : IProductService
             return false;
         }
 
-        await _repository.DeleteAsync(product);
-        return true;
+        return await _repository.DeleteAsync(product);
     }
 
     private static ProductResponse MapToDto(Product product)
